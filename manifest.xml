@@ -1,0 +1,34 @@
+<package>
+  <description brief="robot_follow_vision">
+
+     robot_follow_vision
+
+  </description>
+  <author>Yoshi</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <url>http://nourl</url>
+  <depend package="std_msgs"/>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="actionlib"/>
+  <depend package="move_base"/>
+  <depend package="gmapping"/>
+  <depend package="turtlebot_bringup"/>
+
+  <depend package="sensor_msgs"/>
+  <depend package="nodelet"/>
+  <depend package="pcl_ros"/>
+  <depend package="visualization_msgs"/>
+  <depend package="move_base_msgs"/>
+
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  <depend package="image_transport"/>
+  <depend package="visp"/>
+  <rosdep name="libftdi-dev" />
+
+
+</package>
+
