@@ -134,14 +134,18 @@ int main(int argc, char **argv){
         int iHighV = 100;
         */
 
+        /*
+        office parameters
+
         int iLowH = 115;
         int iHighH = 145;
 
-        int iLowS = 50;
+        int iLowS = 65;
         int iHighS = 142;
 
         int iLowV = 90;
-        int iHighV = 150;
+        int iHighV = 170;
+
         //Create trackbars in "Control" window
         cvCreateTrackbar("LowH", "Control", &iLowH, 25); //Hue (0 - 179)
         cvCreateTrackbar("HighH", "Control", &iHighH, 25);
@@ -157,7 +161,37 @@ int main(int argc, char **argv){
         inRange(src_hsv, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgHSV); //Threshold the image
 
         /// Apply the Hough Transform to find the circles
-        HoughCircles( imgHSV, circles, CV_HOUGH_GRADIENT, 2.3, imgHSV.rows/4, 30, 45, 0, 0);
+        HoughCircles( imgHSV, circles, CV_HOUGH_GRADIENT, 2.3, imgHSV.rows/4, 35, 43, 0, 0);
+
+        */
+
+        int iLowH = 115;
+        int iHighH = 145;
+
+        int iLowS = 100;
+        int iHighS = 200;
+
+        int iLowV = 90;
+        int iHighV = 255;
+
+        //Create trackbars in "Control" window
+        cvCreateTrackbar("LowH", "Control", &iLowH, 25); //Hue (0 - 179)
+        cvCreateTrackbar("HighH", "Control", &iHighH, 25);
+
+        cvCreateTrackbar("LowS", "Control", &iLowS, 75); //Saturation (0 - 255)
+        cvCreateTrackbar("HighS", "Control", &iHighS, 75);
+
+        cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
+        cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+
+        blur( src_hsv, src_hsv, Size(3,3) );
+        GaussianBlur( src_hsv, src_hsv, Size(5, 5), 0, 0 );
+
+
+        inRange(src_hsv, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgHSV); //Threshold the image
+
+        /// Apply the Hough Transform to find the circles
+        HoughCircles( imgHSV, circles, CV_HOUGH_GRADIENT, 2.3, imgHSV.rows/4, 35, 30, 0, 0);
 
         /// Draw the circles detected
         for( size_t i = 0; i < circles.size(); i++ )

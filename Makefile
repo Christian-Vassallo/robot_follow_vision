@@ -231,6 +231,45 @@ doxygen/fast:
 .PHONY : doxygen/fast
 
 #=============================================================================
+# Target rules for targets named ellipsedetect
+
+# Build rule for target.
+ellipsedetect: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ellipsedetect
+.PHONY : ellipsedetect
+
+# fast build rule for target.
+ellipsedetect/fast:
+	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/build
+.PHONY : ellipsedetect/fast
+
+#=============================================================================
+# Target rules for targets named mocaptracking
+
+# Build rule for target.
+mocaptracking: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mocaptracking
+.PHONY : mocaptracking
+
+# fast build rule for target.
+mocaptracking/fast:
+	$(MAKE) -f CMakeFiles/mocaptracking.dir/build.make CMakeFiles/mocaptracking.dir/build
+.PHONY : mocaptracking/fast
+
+#=============================================================================
+# Target rules for targets named robotcontrol
+
+# Build rule for target.
+robotcontrol: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 robotcontrol
+.PHONY : robotcontrol
+
+# fast build rule for target.
+robotcontrol/fast:
+	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/build
+.PHONY : robotcontrol/fast
+
+#=============================================================================
 # Target rules for targets named rosbuild_clean-test-results
 
 # Build rule for target.
@@ -438,6 +477,78 @@ gtest_main/fast:
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
+src/ellipsdetection.o: src/ellipsdetection.cpp.o
+.PHONY : src/ellipsdetection.o
+
+# target to build an object file
+src/ellipsdetection.cpp.o:
+	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.o
+.PHONY : src/ellipsdetection.cpp.o
+
+src/ellipsdetection.i: src/ellipsdetection.cpp.i
+.PHONY : src/ellipsdetection.i
+
+# target to preprocess a source file
+src/ellipsdetection.cpp.i:
+	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.i
+.PHONY : src/ellipsdetection.cpp.i
+
+src/ellipsdetection.s: src/ellipsdetection.cpp.s
+.PHONY : src/ellipsdetection.s
+
+# target to generate assembly for a file
+src/ellipsdetection.cpp.s:
+	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.s
+.PHONY : src/ellipsdetection.cpp.s
+
+src/elliptical-coord-control.o: src/elliptical-coord-control.cpp.o
+.PHONY : src/elliptical-coord-control.o
+
+# target to build an object file
+src/elliptical-coord-control.cpp.o:
+	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.o
+.PHONY : src/elliptical-coord-control.cpp.o
+
+src/elliptical-coord-control.i: src/elliptical-coord-control.cpp.i
+.PHONY : src/elliptical-coord-control.i
+
+# target to preprocess a source file
+src/elliptical-coord-control.cpp.i:
+	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.i
+.PHONY : src/elliptical-coord-control.cpp.i
+
+src/elliptical-coord-control.s: src/elliptical-coord-control.cpp.s
+.PHONY : src/elliptical-coord-control.s
+
+# target to generate assembly for a file
+src/elliptical-coord-control.cpp.s:
+	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.s
+.PHONY : src/elliptical-coord-control.cpp.s
+
+src/mocap-tracking-beta.o: src/mocap-tracking-beta.cpp.o
+.PHONY : src/mocap-tracking-beta.o
+
+# target to build an object file
+src/mocap-tracking-beta.cpp.o:
+	$(MAKE) -f CMakeFiles/mocaptracking.dir/build.make CMakeFiles/mocaptracking.dir/src/mocap-tracking-beta.cpp.o
+.PHONY : src/mocap-tracking-beta.cpp.o
+
+src/mocap-tracking-beta.i: src/mocap-tracking-beta.cpp.i
+.PHONY : src/mocap-tracking-beta.i
+
+# target to preprocess a source file
+src/mocap-tracking-beta.cpp.i:
+	$(MAKE) -f CMakeFiles/mocaptracking.dir/build.make CMakeFiles/mocaptracking.dir/src/mocap-tracking-beta.cpp.i
+.PHONY : src/mocap-tracking-beta.cpp.i
+
+src/mocap-tracking-beta.s: src/mocap-tracking-beta.cpp.s
+.PHONY : src/mocap-tracking-beta.s
+
+# target to generate assembly for a file
+src/mocap-tracking-beta.cpp.s:
+	$(MAKE) -f CMakeFiles/mocaptracking.dir/build.make CMakeFiles/mocaptracking.dir/src/mocap-tracking-beta.cpp.s
+.PHONY : src/mocap-tracking-beta.cpp.s
+
 src/testopencv.o: src/testopencv.cpp.o
 .PHONY : src/testopencv.o
 
@@ -500,11 +611,14 @@ help:
 	@echo "... clean_test_results"
 	@echo "... doxygen"
 	@echo "... edit_cache"
+	@echo "... ellipsedetect"
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
+	@echo "... mocaptracking"
 	@echo "... rebuild_cache"
+	@echo "... robotcontrol"
 	@echo "... rosbuild_clean-test-results"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -521,6 +635,15 @@ help:
 	@echo "... visioncontrol"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... src/ellipsdetection.o"
+	@echo "... src/ellipsdetection.i"
+	@echo "... src/ellipsdetection.s"
+	@echo "... src/elliptical-coord-control.o"
+	@echo "... src/elliptical-coord-control.i"
+	@echo "... src/elliptical-coord-control.s"
+	@echo "... src/mocap-tracking-beta.o"
+	@echo "... src/mocap-tracking-beta.i"
+	@echo "... src/mocap-tracking-beta.s"
 	@echo "... src/testopencv.o"
 	@echo "... src/testopencv.i"
 	@echo "... src/testopencv.s"

@@ -33,9 +33,17 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+set(HDRS
+  ./src/Robulab10Class.hpp
+  ./src/CameraClass.hpp
+  ./src/mocapmessenger.hpp
+   )
 
-rosbuild_add_executable(testopencv ${HDRS} ./src/testopencv.cpp)
+rosbuild_add_executable(testopencv ./src/testopencv.cpp)
 target_link_libraries(testopencv ${OpenCV_LIBRARIES})
+
+rosbuild_add_executable(ellipsedetect ./src/ellipsdetection.cpp)
+target_link_libraries(ellipsedetect ${OpenCV_LIBRARIES})
 
 find_package(VISP REQUIRED)
 if(VISP_FOUND)
@@ -45,8 +53,10 @@ if(VISP_FOUND)
   link_libraries(${VISP_LIBRARIES})
 endif(VISP_FOUND)
 
-rosbuild_add_executable(visioncontrol src/vision-control-beta.cpp)
+rosbuild_add_executable(visioncontrol ./src/Robulab10Class.hpp src/vision-control-beta.cpp)
 target_link_libraries(visioncontrol ${OpenCV_LIBRARIES})
 
+rosbuild_add_executable(robotcontrol ./src/Robulab10Class.hpp src/elliptical-coord-control.cpp)
 
+rosbuild_add_executable(mocaptracking ${HDRS} src/mocap-tracking-beta.cpp)
 

@@ -36,8 +36,8 @@
 #include <visp/vpImage.h>
 #include <visp/vpImageIo.h>
 #include <visp/vpImageConvert.h>
-#include "Robulab10Class.hpp"
 
+#include "Robulab10Class.hpp"
 
 using namespace cv;
 static bool stop_interrupt = false;
@@ -54,57 +54,56 @@ void my_handler(int s){
 void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 {
 
-  Mat frame, frame_hsv, imgHSV;
-  Eigen::MatrixXd blobs_matrix_data = Eigen::MatrixXd::Zero(2,3);
-  std_msgs::Float64MultiArray cog_blobs;
-
+  Mat src;
   vector<Vec3f> circles;
+  std_msgs::Float64MultiArray cog_blobs;
+  Eigen::MatrixXd blobs_matrix_data = Eigen::MatrixXd::Zero(2,3);
 
-  while(circles.size()<2){
+  /// Ellipses are detected considering rectangle shape
+  Point2f rectangles[4];
 
-    /// OPENCV PART - Looking for circles
-    /// Filter, smooth and look for circles in the frame
+  int counting = 0;
+  int eps = 5;
 
-    vcap >> frame; // get a new frame from camera
-    std::cout << "Image size: " << frame.rows << " " << frame.cols << std::endl;
+  while(counting<2){
 
-    cvtColor( frame, frame_hsv, CV_RGB2HSV );
+    /// OPENCV PART - Looking for ellipses
 
-    int iLowH = 115;
-    int iHighH = 145;
+    vcap >> src; // get a new frame from camera
 
-    int iLowS = 75;
-    int iHighS = 142;
+    if(!vcap.read(frame)) {
+        std::cout << "No frame" << std::endl;
+        waitKey();
+    }
 
-    int iLowV = 90;
-    int iHighV = 150;
-    //Create trackbars in "Control" window
-    cvCreateTrackbar("LowH", "Control", &iLowH, 25); //Hue (0 - 179)
-    cvCreateTrackbar("HighH", "Control", &iHighH, 25);
+    /// Ellipses detection
+    Cam.ellipsedetection(src,rectangles);
 
-    cvCreateTrackbar("LowS", "Control", &iLowS, 75); //Saturation (0 - 255)
-    cvCreateTrackbar("HighS", "Control", &iHighS, 75);
+    if(circles.size()>0){
+      if(circlesdatatemp.size()>0){
+        if(!((fabs(circlesdatatemp[0]-circles[0][0])<eps)&&(fabs(circlesdatatemp[1]-circles[0][1]<eps)))){
+            counting++;
+          }
+        }
+      else{
+        circlesdatatemp.push_back(circles[0][0]);
+        circlesdatatemp.push_back(circles[0][1]);
+        counting++;
+        }
+      }
 
-    cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
-    cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+    std::cout << "Looking for circles ( " << counting << " found) " << std::endl;
+}
 
-    GaussianBlur( frame_hsv, frame_hsv, Size(13, 13), 0, 0 );
-
-    inRange(frame_hsv, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgHSV); //Threshold the image
-
-    /// Apply the Hough Transform to find the circles
-    HoughCircles( imgHSV, circles, CV_HOUGH_GRADIENT, 2.1, imgHSV.rows/4, 30, 45, 0, 0);
-
-    imshow( "Hough Circle Transform Final", frame );
-    moveWindow("Hough Circle Transform Final", 600, 0);
-
-    std::cout << "cerchi trovati " << circles.size() << std::endl;
-
-   }
-
-
+  /* DEBUGGING
+  std::cout << "final counter" << counting << std::endl;
+  std::cout << "final circles " << std::endl;
   for(unsigned int p=0; p<circles.size(); ++p)
      std::cout << circles[p] << std::endl;
+
+  std::cout << "final storage ";
+  std::cout << circlesdatatemp[0] << " " << circlesdatatemp[1] << std::endl;
+*/
 
   /// VISP PART: Tracking circles
   /// Once found out the circles, tell visp where they are
@@ -125,8 +124,14 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
   // assign blobs position
   vImp.set_u(circles[0][0]);
   vImp.set_v(circles[0][1]);
-  vImp2.set_u(circles[1][0]);
-  vImp2.set_v(circles[1][1]);
+  if(circles.size()>1){
+      vImp2.set_u(circles[1][0]);
+      vImp2.set_v(circles[1][1]);
+    }
+  else{
+      vImp2.set_u(circlesdatatemp[0]);
+      vImp2.set_v(circlesdatatemp[1]);
+    }
 
   // blobs definition
   blob.setGraphics(true);
@@ -144,6 +149,9 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
   //   std::cout << "cog " << blob.getCog() << std::endl;
   //   std::cout << "cog2 " << blob2.getCog() << std::endl;
 
+  double PPx = 330.98367;        // Principal point X
+  double PPy = 273.41515;        // Principal point Y
+
   while(!stop_interrupt) {
 
     vcap >> frame; // get a new frame from camera
@@ -152,7 +160,10 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
     vpDisplay::display(I);
     blob.track(I);
     blob2.track(I);
+    vpDisplay::displayCircle(I,PPy,PPx,10,vpColor::red) ;
+    vpDisplay::displayCross(I, PPy,PPx, 20, vpColor::green) ;
     vpDisplay::flush(I);
+
 
     /// Publishing
 
@@ -169,13 +180,28 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
     blobs_matrix_data(1,1) = blob2.getCog().get_v();
     // blobs2 r
     blobs_matrix_data(1,2) = blob2.getWidth()/2; // ray
+/*
+    // blobs1 x (u)
+    blobs_matrix_data(0,0) = 0;
+    // blobs1 y (v)
+    blobs_matrix_data(0,1) = 1;
+    // blobs1 r
+    blobs_matrix_data(0,2) = 2; // ray
 
+    // blobs2 x (u)
+    blobs_matrix_data(1,0) = 10;
+    // blobs2 y (v)
+    blobs_matrix_data(1,1) = 11;
+    // blobs2 r
+    blobs_matrix_data(1,2) = 12; // ray
+*/
     // conversion to std_msgs
     tf::matrixEigenToMsg(blobs_matrix_data,cog_blobs);
 
     // Define the message to send
     _blob_publisher->publish(cog_blobs);
 
+    std::cout << blobs_matrix_data << std::endl;
 
     ros::Duration(0.005).sleep();
   }
@@ -184,15 +210,17 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 int main(int argc, char **argv)
 {
     // Init ROS
-    ros::init(argc, argv, "visptest");
+    ros::init(argc, argv, "visioncontrol");
     ros::start();
+    std::cout << "dentro main";
 
     ros::NodeHandle blobs;
-    ros::Publisher _blob_publisher = blobs.advertise<std_msgs::Float64MultiArray>("ObjDataMocap", 2000);
+    ros::Publisher _blob_publisher = blobs.advertise<std_msgs::Float64MultiArray>("datacircles", 2000);
 
     /// Establish connection with the camera streaming
     cv::VideoCapture vcap;
     const std::string videoStreamAddress = "rtsp://192.168.1.99/live.sdp";  /// insert here the address
+    //const std::string videoStreamAddress;  /// insert here the address
 
     //open the video stream and make sure it's opened
     if(!vcap.open(videoStreamAddress)) {
@@ -200,12 +228,15 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    std::cout << "quasi whilecccscs";
+
     /// Start Camera Process
     /// Circles are detected with OPENCV and then tracked with VISP.
     /// The topic provides pos_x, pos_y and ray dimension of the circles
     unsigned int exit_condition = 0;
     while(exit_condition<999){          // here condition of exit (when they are big, we can put some exit flag)
       try{
+          std::cout << "dentro try";
         streaming_process(vcap, &_blob_publisher);
       }
       catch(...)
