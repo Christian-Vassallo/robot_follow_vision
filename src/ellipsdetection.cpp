@@ -22,7 +22,6 @@ int main(int argc, char **argv){
     int counting;
     Mat src, frame;
     vector<Vec3f> circles;
-    Point2f rectangles[4];
     vector<RotatedRect> minEllipse;
 
     VideoCapture vcap = Cam.camera_connection("rtsp://192.168.1.99/live.sdp");
@@ -37,15 +36,17 @@ int main(int argc, char **argv){
 
         /// Ellipses detection
         Cam.ellipsedetection(src, minEllipse, &counting);
-        Cam.circledetection(src, circles);
 
-        if (circles.size()>0)
-        std::cout << circles[0] << std::endl;
+        std::cout << "counting " << std::endl;
+        int eps = 10;
 
-        std::cout << "counting " << counting << std::endl;
-        for(unsigned i=0; i<counting; ++i)
-          std::cout << "ellispse " << i << " " << minEllipse[i].center << std::endl;
+        for(unsigned c=0; c<counting-1; c++)
+          std::cout << "ellipse " << c << " " <<  minEllipse[c].center << std::endl;
 
+        for(unsigned n=0; n<counting-1; n++)
+            for(unsigned n2=n+1; n2<counting; n2++)
+              if(fabs(minEllipse[n].center.x - minEllipse[n2].center.x) < eps && fabs(minEllipse[n].center.y - minEllipse[n2].center.y) < eps)
+                std::cout << "falso positivo" << std::endl;
     }
 }
 

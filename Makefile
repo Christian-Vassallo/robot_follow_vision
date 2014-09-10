@@ -244,6 +244,19 @@ ellipsedetect/fast:
 .PHONY : ellipsedetect/fast
 
 #=============================================================================
+# Target rules for targets named featuresdetection
+
+# Build rule for target.
+featuresdetection: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 featuresdetection
+.PHONY : featuresdetection
+
+# fast build rule for target.
+featuresdetection/fast:
+	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/build
+.PHONY : featuresdetection/fast
+
+#=============================================================================
 # Target rules for targets named mocaptracking
 
 # Build rule for target.
@@ -439,19 +452,6 @@ tests/fast:
 .PHONY : tests/fast
 
 #=============================================================================
-# Target rules for targets named visioncontrol
-
-# Build rule for target.
-visioncontrol: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 visioncontrol
-.PHONY : visioncontrol
-
-# fast build rule for target.
-visioncontrol/fast:
-	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/build
-.PHONY : visioncontrol/fast
-
-#=============================================================================
 # Target rules for targets named gtest
 
 # Build rule for target.
@@ -525,6 +525,30 @@ src/elliptical-coord-control.cpp.s:
 	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.s
 .PHONY : src/elliptical-coord-control.cpp.s
 
+src/features-detection.o: src/features-detection.cpp.o
+.PHONY : src/features-detection.o
+
+# target to build an object file
+src/features-detection.cpp.o:
+	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.o
+.PHONY : src/features-detection.cpp.o
+
+src/features-detection.i: src/features-detection.cpp.i
+.PHONY : src/features-detection.i
+
+# target to preprocess a source file
+src/features-detection.cpp.i:
+	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.i
+.PHONY : src/features-detection.cpp.i
+
+src/features-detection.s: src/features-detection.cpp.s
+.PHONY : src/features-detection.s
+
+# target to generate assembly for a file
+src/features-detection.cpp.s:
+	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.s
+.PHONY : src/features-detection.cpp.s
+
 src/mocap-tracking-beta.o: src/mocap-tracking-beta.cpp.o
 .PHONY : src/mocap-tracking-beta.o
 
@@ -573,30 +597,6 @@ src/testopencv.cpp.s:
 	$(MAKE) -f CMakeFiles/testopencv.dir/build.make CMakeFiles/testopencv.dir/src/testopencv.cpp.s
 .PHONY : src/testopencv.cpp.s
 
-src/vision-control-beta.o: src/vision-control-beta.cpp.o
-.PHONY : src/vision-control-beta.o
-
-# target to build an object file
-src/vision-control-beta.cpp.o:
-	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/vision-control-beta.cpp.o
-.PHONY : src/vision-control-beta.cpp.o
-
-src/vision-control-beta.i: src/vision-control-beta.cpp.i
-.PHONY : src/vision-control-beta.i
-
-# target to preprocess a source file
-src/vision-control-beta.cpp.i:
-	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/vision-control-beta.cpp.i
-.PHONY : src/vision-control-beta.cpp.i
-
-src/vision-control-beta.s: src/vision-control-beta.cpp.s
-.PHONY : src/vision-control-beta.s
-
-# target to generate assembly for a file
-src/vision-control-beta.cpp.s:
-	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/vision-control-beta.cpp.s
-.PHONY : src/vision-control-beta.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -612,6 +612,7 @@ help:
 	@echo "... doxygen"
 	@echo "... edit_cache"
 	@echo "... ellipsedetect"
+	@echo "... featuresdetection"
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
@@ -632,7 +633,6 @@ help:
 	@echo "... test-results-run"
 	@echo "... testopencv"
 	@echo "... tests"
-	@echo "... visioncontrol"
 	@echo "... gtest"
 	@echo "... gtest_main"
 	@echo "... src/ellipsdetection.o"
@@ -641,15 +641,15 @@ help:
 	@echo "... src/elliptical-coord-control.o"
 	@echo "... src/elliptical-coord-control.i"
 	@echo "... src/elliptical-coord-control.s"
+	@echo "... src/features-detection.o"
+	@echo "... src/features-detection.i"
+	@echo "... src/features-detection.s"
 	@echo "... src/mocap-tracking-beta.o"
 	@echo "... src/mocap-tracking-beta.i"
 	@echo "... src/mocap-tracking-beta.s"
 	@echo "... src/testopencv.o"
 	@echo "... src/testopencv.i"
 	@echo "... src/testopencv.s"
-	@echo "... src/vision-control-beta.o"
-	@echo "... src/vision-control-beta.i"
-	@echo "... src/vision-control-beta.s"
 .PHONY : help
 
 

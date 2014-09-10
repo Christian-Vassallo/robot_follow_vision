@@ -14,7 +14,6 @@ using namespace cv;
 
 class Camera
 {
-
 public:
     Camera(){}
     ~Camera(){}
@@ -22,6 +21,7 @@ public:
    // void ellipsedetection(Mat src, Point2f *rect_points, int *counting);
     void ellipsedetection(Mat src, vector<RotatedRect> &minEllipse, int *counting);
     void circledetection(Mat src, vector<Vec3f> &circles);
+    void remove_distorsion(double &pixelxy, double &cc, double &fc, double &kc, double alpha_c, double &xp);
 };
 
 
@@ -37,6 +37,7 @@ VideoCapture Camera::camera_connection(const std::string videoStreamAddress)
 
   return VideoStreaming;
 }
+
 
 void Camera::ellipsedetection(Mat src, vector<RotatedRect> &minEllipse, int *counting){
 
@@ -120,9 +121,9 @@ void Camera::ellipsedetection(Mat src, vector<RotatedRect> &minEllipse, int *cou
   namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
   imshow( "Contours", drawing );
 
-  std::cout << "xe1 " << (rect_points[0].x + rect_points[2].x)/2 << " - ye1 " << (rect_points[1].y + rect_points[3].y)/2 << std::endl;
+  //std::cout << "xe1 " << (rect_points[0].x + rect_points[2].x)/2 << " - ye1 " << (rect_points[1].y + rect_points[3].y)/2 << std::endl;
   *counting =  contours.size() ;
-  std::cout << "counting " << *counting << std::endl;
+  //std::cout << "counting " << *counting << std::endl;
 
   waitKey(5);
 }
