@@ -231,32 +231,6 @@ doxygen/fast:
 .PHONY : doxygen/fast
 
 #=============================================================================
-# Target rules for targets named ellipsedetect
-
-# Build rule for target.
-ellipsedetect: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ellipsedetect
-.PHONY : ellipsedetect
-
-# fast build rule for target.
-ellipsedetect/fast:
-	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/build
-.PHONY : ellipsedetect/fast
-
-#=============================================================================
-# Target rules for targets named featuresdetection
-
-# Build rule for target.
-featuresdetection: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 featuresdetection
-.PHONY : featuresdetection
-
-# fast build rule for target.
-featuresdetection/fast:
-	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/build
-.PHONY : featuresdetection/fast
-
-#=============================================================================
 # Target rules for targets named mocaptracking
 
 # Build rule for target.
@@ -426,6 +400,19 @@ test-results-run/fast:
 .PHONY : test-results-run/fast
 
 #=============================================================================
+# Target rules for targets named testellipsedetect
+
+# Build rule for target.
+testellipsedetect: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 testellipsedetect
+.PHONY : testellipsedetect
+
+# fast build rule for target.
+testellipsedetect/fast:
+	$(MAKE) -f CMakeFiles/testellipsedetect.dir/build.make CMakeFiles/testellipsedetect.dir/build
+.PHONY : testellipsedetect/fast
+
+#=============================================================================
 # Target rules for targets named testopencv
 
 # Build rule for target.
@@ -450,6 +437,19 @@ tests: cmake_check_build_system
 tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
+
+#=============================================================================
+# Target rules for targets named visioncontrol
+
+# Build rule for target.
+visioncontrol: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 visioncontrol
+.PHONY : visioncontrol
+
+# fast build rule for target.
+visioncontrol/fast:
+	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/build
+.PHONY : visioncontrol/fast
 
 #=============================================================================
 # Target rules for targets named gtest
@@ -482,7 +482,7 @@ src/ellipsdetection.o: src/ellipsdetection.cpp.o
 
 # target to build an object file
 src/ellipsdetection.cpp.o:
-	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.o
+	$(MAKE) -f CMakeFiles/testellipsedetect.dir/build.make CMakeFiles/testellipsedetect.dir/src/ellipsdetection.cpp.o
 .PHONY : src/ellipsdetection.cpp.o
 
 src/ellipsdetection.i: src/ellipsdetection.cpp.i
@@ -490,7 +490,7 @@ src/ellipsdetection.i: src/ellipsdetection.cpp.i
 
 # target to preprocess a source file
 src/ellipsdetection.cpp.i:
-	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.i
+	$(MAKE) -f CMakeFiles/testellipsedetect.dir/build.make CMakeFiles/testellipsedetect.dir/src/ellipsdetection.cpp.i
 .PHONY : src/ellipsdetection.cpp.i
 
 src/ellipsdetection.s: src/ellipsdetection.cpp.s
@@ -498,7 +498,7 @@ src/ellipsdetection.s: src/ellipsdetection.cpp.s
 
 # target to generate assembly for a file
 src/ellipsdetection.cpp.s:
-	$(MAKE) -f CMakeFiles/ellipsedetect.dir/build.make CMakeFiles/ellipsedetect.dir/src/ellipsdetection.cpp.s
+	$(MAKE) -f CMakeFiles/testellipsedetect.dir/build.make CMakeFiles/testellipsedetect.dir/src/ellipsdetection.cpp.s
 .PHONY : src/ellipsdetection.cpp.s
 
 src/elliptical-coord-control.o: src/elliptical-coord-control.cpp.o
@@ -530,7 +530,7 @@ src/features-detection.o: src/features-detection.cpp.o
 
 # target to build an object file
 src/features-detection.cpp.o:
-	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.o
+	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/features-detection.cpp.o
 .PHONY : src/features-detection.cpp.o
 
 src/features-detection.i: src/features-detection.cpp.i
@@ -538,7 +538,7 @@ src/features-detection.i: src/features-detection.cpp.i
 
 # target to preprocess a source file
 src/features-detection.cpp.i:
-	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.i
+	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/features-detection.cpp.i
 .PHONY : src/features-detection.cpp.i
 
 src/features-detection.s: src/features-detection.cpp.s
@@ -546,7 +546,7 @@ src/features-detection.s: src/features-detection.cpp.s
 
 # target to generate assembly for a file
 src/features-detection.cpp.s:
-	$(MAKE) -f CMakeFiles/featuresdetection.dir/build.make CMakeFiles/featuresdetection.dir/src/features-detection.cpp.s
+	$(MAKE) -f CMakeFiles/visioncontrol.dir/build.make CMakeFiles/visioncontrol.dir/src/features-detection.cpp.s
 .PHONY : src/features-detection.cpp.s
 
 src/mocap-tracking-beta.o: src/mocap-tracking-beta.cpp.o
@@ -611,8 +611,6 @@ help:
 	@echo "... clean_test_results"
 	@echo "... doxygen"
 	@echo "... edit_cache"
-	@echo "... ellipsedetect"
-	@echo "... featuresdetection"
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
@@ -631,8 +629,10 @@ help:
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
+	@echo "... testellipsedetect"
 	@echo "... testopencv"
 	@echo "... tests"
+	@echo "... visioncontrol"
 	@echo "... gtest"
 	@echo "... gtest_main"
 	@echo "... src/ellipsdetection.o"

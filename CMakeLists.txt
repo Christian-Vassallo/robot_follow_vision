@@ -42,9 +42,8 @@ set(HDRS
 rosbuild_add_executable(testopencv ./src/testopencv.cpp)
 target_link_libraries(testopencv ${OpenCV_LIBRARIES})
 
-rosbuild_add_executable(ellipsedetect ./src/ellipsdetection.cpp)
-message("------------------opencv lib:${OpenCV_LIBRARIES}")
-target_link_libraries(ellipsedetect ${OpenCV_LIBRARIES} /opt/ros/groovy/lib/libopencv_ts.a)
+rosbuild_add_executable(testellipsedetect ./src/ellipsdetection.cpp)
+target_link_libraries(testellipsedetect ${OpenCV_LIBRARIES})
 
 find_package(VISP REQUIRED)
 if(VISP_FOUND)
@@ -54,8 +53,8 @@ if(VISP_FOUND)
   link_libraries(${VISP_LIBRARIES})
 endif(VISP_FOUND)
 
-rosbuild_add_executable(featuresdetection ${HDRS} src/features-detection.cpp)
-target_link_libraries(featuresdetection ${OpenCV_LIBRARIES})
+rosbuild_add_executable(visioncontrol ${HDRS} src/features-detection.cpp)
+target_link_libraries(visioncontrol ${OpenCV_LIBRARIES})
 
 rosbuild_add_executable(robotcontrol ./src/Robulab10Class.hpp src/elliptical-coord-control.cpp)
 
