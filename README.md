@@ -37,3 +37,12 @@ main.m -> main program: receives data and plot them
 xxxMSG.m -> files used for the subscribers
 
 
+To execute everything
+launch: visioncontrol
+wait that the features are recognized (check output)
+launch: robotcontrol
+
+REMEMBER: to stop the robot -> Control + C
+
+
+
