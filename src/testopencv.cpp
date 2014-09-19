@@ -164,6 +164,27 @@ int main(int argc, char **argv){
         HoughCircles( imgHSV, circles, CV_HOUGH_GRADIENT, 2.3, imgHSV.rows/4, 35, 43, 0, 0);
 
         */
+/* MORNING
+        int iLowH = 115;
+        int iHighH = 145;
+
+        int iLowS = 100;
+        int iHighS = 200;
+
+        int iLowV = 125;
+        int iHighV = 150;
+
+
+        //Create trackbars in "Control" window
+        cvCreateTrackbar("LowH", "Control", &iLowH, 115); //Hue (0 - 179)
+        cvCreateTrackbar("HighH", "Control", &iHighH, 145);
+
+        cvCreateTrackbar("LowS", "Control", &iLowS, 100); //Saturation (0 - 255)
+        cvCreateTrackbar("HighS", "Control", &iHighS, 200);
+
+        cvCreateTrackbar("LowV", "Control", &iLowV, 125); //Value (0 - 255)
+        cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+*/
 
         int iLowH = 115;
         int iHighH = 145;

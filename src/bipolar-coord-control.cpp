@@ -1,3 +1,5 @@
+/// Bipolar Control
+
 
 #include "ros/ros.h"
 #include <sstream>
@@ -27,6 +29,13 @@ static bool stop_interrupt = false;
 
 void getDataCircles(const std_msgs::Float64MultiArray::ConstPtr& array);
 void my_handler(int s);
+
+double cot(double x){return (cos(x)/sin(x));}
+double coth(double x){return (cosh(x)/sinh(x));}
+double csc(double x){return (1/sin(x));}
+double csch(double x){return (1/sinh(x));}
+
+
 
 void getDataCircles(const std_msgs::Float64MultiArray::ConstPtr& array)
 {
@@ -149,10 +158,15 @@ int main(int argc, char* argv[])
    double xp[2];
    double x1p, y1p;
 
+   double K0, K, K1, K2;
+   double tau, alpha, betap, beta_d, s;
+   double p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13;
+
    /// Gains of the control
-   double K1 = 0.002;       // Gain for the forward velocity
-   double K2 = 6.5/10;   // How fast beta converges to zero
-   double lambda = 300;    // How fast eta converges to zero
+   K0 = atof(argv[2]);
+   K = atof(argv[3]);
+   K1 =  atof(argv[4]);
+   K2 =  atof(argv[5]);
 
    /// Delay before to get information from MocapRobulab (to avoid null data)
    std::cout << "... Initilization Virtual Tracking..." << std::endl;
@@ -232,7 +246,7 @@ int main(int argc, char* argv[])
        if((x1centered==x1centered_before && y1centered==y1centered_before) || (x2centered==x2centered_before && y2centered==y2centered_before))
          {
            std::cout << "Equal data" << std::endl;
-           target_lost = true;
+           //target_lost = true;
           }
        if((iter % 200)==0){
          x1centered_before = x1centered;
@@ -242,7 +256,7 @@ int main(int argc, char* argv[])
          }
 
        /// If the two target are not in the same level (one of them is noise)
-       if(fabs(y1centered-y2centered)>10)
+       if(fabs(y1centered-y2centered)>30)
          {
           target_lost = true;
           std::cout << "Different LEVEL" << std::endl;
@@ -264,23 +278,60 @@ int main(int argc, char* argv[])
        std::cout << " y2c = " << y2centered << " y2cb " << y2centered_before << std::endl;
        std::cout << " ---------------------------------- " << std::endl;
 
+       //std::cout << "a x " << alphax << std::endl;
 
        /// CONTROL LAW
+
+       /// Bipolar coordinates in the image plane...
        A = y2*sqrt(x1*x1+alphax*alphax);
        B = y1*sqrt(x2*x2+alphax*alphax);
        C = sqrt((x1*y2-x2*y1)*(x1*y2-x2*y1)+alphax*alphax*(y2-y1)*(y2-y1));
 
-       /// Elliptic coordinates
+       //std::cout << "A " << A << "\n B " << B << "\n C" << C << std::endl;
        xi = acosh((A+B)/C);
        eta = M_PI/2-acos((A-B)/C);
        betae = -(atan(x1/alphax)+(atan(x2/alphax)-atan(x1/alphax))/2);
 
-       /// Control law in elliptic coordinates (Path Following like)
-       if(iter<samples){
-         v = a * Ka[iter] * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
-         }
-       else
-         v = a * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
+       //std::cout << "xi " << xi << "\n eta " << eta << "\n betae" << betae << std::endl;
+
+
+       tau = log(A/B);
+       alpha = M_PI-fabs(atan(x1/alphax)-atan(x2/alphax));
+       betap = atan(sin(alpha)*sinh(tau)/(1-cos(alpha)*cosh(tau)))-(atan(tan(eta)*tanh(xi))-betae+M_PI)+M_PI;
+
+       //std::cout << "tau " << tau << "\n alpha " << alpha << "\n betap" << betap << std::endl;
+
+
+       beta_d = -atan2(K*sinh(tau),sin(alpha));
+       s = betap-beta_d;
+
+       v = K2*(alpha*cos(betap)-tau*sin(betap));
+
+       p1 = K1 * s;
+       p2 = cos(alpha)-cosh(tau);
+       p3 = cos(alpha)*cosh(tau);
+       p4 = cot(alpha)*coth(tau);
+       p5 = csc(alpha)*csch(tau);
+       p6 = cos(betap)*csc(alpha);
+       p7 = csch(tau)*sin(betap);
+       p8 = cos(alpha)+cosh(tau);
+       p9 = cosh(tau)*sin(betap);
+       p10 = cos(betap)*cot(alpha)*sinh(tau);
+       p11 = K;
+       p12 = csc(alpha);
+       p13 = sinh(tau);
+
+       if (tau <= 0.0001)
+           omega = K0*(K1 * s + v * (1/a * (1 + K + cos(alpha)) * cot(0.5 * alpha) * sin(betap)));
+       else{
+           omega = K0 * (p1 + v * (-1/a * 1/p2 * p3*p3 * (1+1/sqrt(pow((p4+p5),2))) * (p6+p7) + K * p8 * csc(alpha) * (p9+p10) * pow((a + a*p11*p11*p12*p12*p13*p13),-1) ));
+        }
+
+
+
+
+
+
 
        if (v>1.5){
            Robot.move_robot(0,0);
@@ -288,21 +339,17 @@ int main(int argc, char* argv[])
            exit(-1);
          }
 
-
-       if (betae<=0.01)
-           omegao = -lambda*eta*K1-K2*betae;
-       else
-           omegao = -lambda*eta*K1*sin(betae)/betae-K2*betae;
-
-       omega = -omegao+K1*(1/(cos(2*eta)+cosh(2*xi)))*((-2)*cos(betae)*cos(eta)*sin(eta)+sin(betae)*sinh(2*xi));
-
        w = omega;
 
         // Some print out
        std::cout << " ----------------------------------------- " << std::endl;
-       std::cout << "xi " << xi << std::endl;
-       std::cout << "eta: " << eta << std::endl;
-       std::cout << "betae: " << betae << std::endl;
+       //std::cout << "tau " << tau << std::endl;
+       //std::cout << "alpha: " << alpha << std::endl;
+       //std::cout << "betap: " << betap << std::endl;
+       //std::cout << "beta_d: " << beta_d << std::endl;
+       //std::cout << "s: " << s << std::endl;
+
+       std::cout << "Gain: K0 " << argv[2] << " ; K " << argv[3] << " ; K1 " << argv[4] << " K2 " << argv[5] << std::endl;
        std::cout << "Robot controls - v: " << v << " omega: " << w <<  " omegao: " << omegao << std::endl;
        //std::cout << " ----------------------------------------- " << std::endl;
 
@@ -315,8 +362,11 @@ int main(int argc, char* argv[])
          }
       else
          if(!target_lost){
-           std::cout << "Move!" << std::endl;
-           Robot.move_robot(v, w);
+           if( atof(argv[1])==1 ||  atof(argv[1])==2){
+               std::cout << "Move!" << std::endl;
+
+            Robot.move_robot(v, w);
+             }
            }
          else
            {
@@ -341,14 +391,17 @@ int main(int argc, char* argv[])
        ++iter;
    }
 
-
+   double spaceoffset = 1.5;
+   double timeoffset = spaceoffset / v;
 
    if(go_though_door){
        stop_interrupt=false;
      std::cout << "Through the door" << std::endl;
-     timenowdouble = time(NULL)+8;
+     timenowdouble = time(NULL)+timeoffset;
      while(time(NULL)<timenowdouble && stop_interrupt==false){
-         Robot.move_robot(0.2,0);
+         if( atof(argv[1])==2)
+            Robot.move_robot(v,0);
+
          ros::Duration(0.02).sleep();
        }
     }
@@ -356,7 +409,14 @@ int main(int argc, char* argv[])
    Robot.move_robot(0, 0);
 
 
+/*
+   timenowdouble = time(NULL)+2;
+   while(time(NULL)<timenowdouble && stop_interrupt==false){
+       Robot.move_robot(0.3, 0);
+       ros::Duration(0.01).sleep();
+     }
 
+*/
 /* OFFLINE TEST COMMUNICATION
    for(int itert=0; itert<300; ++itert)
      {
@@ -368,7 +428,7 @@ int main(int argc, char* argv[])
      }
 */
 
-
+   /*
    std::cout << "Converting Data RobotControl to Matlab" << std::endl;
    Eigen::MatrixXd robotcontrol_data_matrix = Eigen::MatrixXd::Zero(robotcontol_data.size(),2);
    std_msgs::Float64MultiArray robotcontrol_data_msg;
@@ -416,9 +476,10 @@ int main(int argc, char* argv[])
 
     ros::Duration(0.01).sleep();
     }
-
+*/
    Robot.move_robot(0, 0);
 
    return 0;
 
 }
+

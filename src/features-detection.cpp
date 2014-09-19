@@ -46,12 +46,10 @@ using namespace cv;
 static bool stop_interrupt = false;
 
 void my_handler(int s){
-           Robulab10 Robot;
-           printf("Caught signal %d\n",s);
            stop_interrupt = true;
 
-           Robot.establish_connection();
-           Robot.move_robot(0,0);
+           std::cout << "Process killed" << std::endl;
+           exit(-1);
 }
 
 
@@ -64,6 +62,13 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
   int zerovalue=0;
   int eps = 5;                          // Threeshold to detect falsepositive
   bool notvalidvalue=false;
+
+  // Active signal (CTRL + C interrupt)
+  struct sigaction sigIntHandler;
+  sigIntHandler.sa_handler = my_handler;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+  sigaction(SIGINT, &sigIntHandler, NULL);
 
   Mat src;                              // Frame
   vector<Vec3f> circles;                // Vector of coordinates indicating x,y,r parameters of circles detected

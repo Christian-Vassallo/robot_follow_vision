@@ -56,7 +56,9 @@ endif(VISP_FOUND)
 rosbuild_add_executable(visioncontrol ${HDRS} src/features-detection.cpp)
 target_link_libraries(visioncontrol ${OpenCV_LIBRARIES})
 
-rosbuild_add_executable(robotcontrol ./src/Robulab10Class.hpp src/elliptical-coord-control.cpp)
+rosbuild_add_executable(ellipscoordcontrol ./src/Robulab10Class.hpp src/elliptical-coord-control.cpp)
+
+rosbuild_add_executable(bipolarcoordcontrol ./src/Robulab10Class.hpp src/bipolar-coord-control.cpp)
 
 rosbuild_add_executable(mocaptracking ${HDRS} src/mocap-tracking-beta.cpp)
 

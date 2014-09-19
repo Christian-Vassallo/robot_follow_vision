@@ -205,6 +205,19 @@ _catkin_empty_exported_target/fast:
 .PHONY : _catkin_empty_exported_target/fast
 
 #=============================================================================
+# Target rules for targets named bipolarcoordcontrol
+
+# Build rule for target.
+bipolarcoordcontrol: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bipolarcoordcontrol
+.PHONY : bipolarcoordcontrol
+
+# fast build rule for target.
+bipolarcoordcontrol/fast:
+	$(MAKE) -f CMakeFiles/bipolarcoordcontrol.dir/build.make CMakeFiles/bipolarcoordcontrol.dir/build
+.PHONY : bipolarcoordcontrol/fast
+
+#=============================================================================
 # Target rules for targets named clean_test_results
 
 # Build rule for target.
@@ -231,6 +244,19 @@ doxygen/fast:
 .PHONY : doxygen/fast
 
 #=============================================================================
+# Target rules for targets named ellipscoordcontrol
+
+# Build rule for target.
+ellipscoordcontrol: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ellipscoordcontrol
+.PHONY : ellipscoordcontrol
+
+# fast build rule for target.
+ellipscoordcontrol/fast:
+	$(MAKE) -f CMakeFiles/ellipscoordcontrol.dir/build.make CMakeFiles/ellipscoordcontrol.dir/build
+.PHONY : ellipscoordcontrol/fast
+
+#=============================================================================
 # Target rules for targets named mocaptracking
 
 # Build rule for target.
@@ -242,19 +268,6 @@ mocaptracking: cmake_check_build_system
 mocaptracking/fast:
 	$(MAKE) -f CMakeFiles/mocaptracking.dir/build.make CMakeFiles/mocaptracking.dir/build
 .PHONY : mocaptracking/fast
-
-#=============================================================================
-# Target rules for targets named robotcontrol
-
-# Build rule for target.
-robotcontrol: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 robotcontrol
-.PHONY : robotcontrol
-
-# fast build rule for target.
-robotcontrol/fast:
-	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/build
-.PHONY : robotcontrol/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_clean-test-results
@@ -477,6 +490,30 @@ gtest_main/fast:
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
+src/bipolar-coord-control.o: src/bipolar-coord-control.cpp.o
+.PHONY : src/bipolar-coord-control.o
+
+# target to build an object file
+src/bipolar-coord-control.cpp.o:
+	$(MAKE) -f CMakeFiles/bipolarcoordcontrol.dir/build.make CMakeFiles/bipolarcoordcontrol.dir/src/bipolar-coord-control.cpp.o
+.PHONY : src/bipolar-coord-control.cpp.o
+
+src/bipolar-coord-control.i: src/bipolar-coord-control.cpp.i
+.PHONY : src/bipolar-coord-control.i
+
+# target to preprocess a source file
+src/bipolar-coord-control.cpp.i:
+	$(MAKE) -f CMakeFiles/bipolarcoordcontrol.dir/build.make CMakeFiles/bipolarcoordcontrol.dir/src/bipolar-coord-control.cpp.i
+.PHONY : src/bipolar-coord-control.cpp.i
+
+src/bipolar-coord-control.s: src/bipolar-coord-control.cpp.s
+.PHONY : src/bipolar-coord-control.s
+
+# target to generate assembly for a file
+src/bipolar-coord-control.cpp.s:
+	$(MAKE) -f CMakeFiles/bipolarcoordcontrol.dir/build.make CMakeFiles/bipolarcoordcontrol.dir/src/bipolar-coord-control.cpp.s
+.PHONY : src/bipolar-coord-control.cpp.s
+
 src/ellipsdetection.o: src/ellipsdetection.cpp.o
 .PHONY : src/ellipsdetection.o
 
@@ -506,7 +543,7 @@ src/elliptical-coord-control.o: src/elliptical-coord-control.cpp.o
 
 # target to build an object file
 src/elliptical-coord-control.cpp.o:
-	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.o
+	$(MAKE) -f CMakeFiles/ellipscoordcontrol.dir/build.make CMakeFiles/ellipscoordcontrol.dir/src/elliptical-coord-control.cpp.o
 .PHONY : src/elliptical-coord-control.cpp.o
 
 src/elliptical-coord-control.i: src/elliptical-coord-control.cpp.i
@@ -514,7 +551,7 @@ src/elliptical-coord-control.i: src/elliptical-coord-control.cpp.i
 
 # target to preprocess a source file
 src/elliptical-coord-control.cpp.i:
-	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.i
+	$(MAKE) -f CMakeFiles/ellipscoordcontrol.dir/build.make CMakeFiles/ellipscoordcontrol.dir/src/elliptical-coord-control.cpp.i
 .PHONY : src/elliptical-coord-control.cpp.i
 
 src/elliptical-coord-control.s: src/elliptical-coord-control.cpp.s
@@ -522,7 +559,7 @@ src/elliptical-coord-control.s: src/elliptical-coord-control.cpp.s
 
 # target to generate assembly for a file
 src/elliptical-coord-control.cpp.s:
-	$(MAKE) -f CMakeFiles/robotcontrol.dir/build.make CMakeFiles/robotcontrol.dir/src/elliptical-coord-control.cpp.s
+	$(MAKE) -f CMakeFiles/ellipscoordcontrol.dir/build.make CMakeFiles/ellipscoordcontrol.dir/src/elliptical-coord-control.cpp.s
 .PHONY : src/elliptical-coord-control.cpp.s
 
 src/features-detection.o: src/features-detection.cpp.o
@@ -608,16 +645,17 @@ help:
 	@echo "... ROSBUILD_gensrv_cpp"
 	@echo "... ROSBUILD_gensrv_lisp"
 	@echo "... _catkin_empty_exported_target"
+	@echo "... bipolarcoordcontrol"
 	@echo "... clean_test_results"
 	@echo "... doxygen"
 	@echo "... edit_cache"
+	@echo "... ellipscoordcontrol"
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... mocaptracking"
 	@echo "... rebuild_cache"
-	@echo "... robotcontrol"
 	@echo "... rosbuild_clean-test-results"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
@@ -635,6 +673,9 @@ help:
 	@echo "... visioncontrol"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... src/bipolar-coord-control.o"
+	@echo "... src/bipolar-coord-control.i"
+	@echo "... src/bipolar-coord-control.s"
 	@echo "... src/ellipsdetection.o"
 	@echo "... src/ellipsdetection.i"
 	@echo "... src/ellipsdetection.s"

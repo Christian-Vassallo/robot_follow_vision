@@ -60,6 +60,8 @@ void Camera::ellipsedetection(Mat src, vector<RotatedRect> &minEllipse, int *cou
   moveWindow("Source", 680, 200);
 
   /// Set filter parameters to detect the ellipse
+
+  /// AFTERNOON
   int iLowH = 115;
   int iHighH = 145;
 
@@ -78,6 +80,29 @@ void Camera::ellipsedetection(Mat src, vector<RotatedRect> &minEllipse, int *cou
 
   cvCreateTrackbar("LowV", "Control", &iLowV, 255); //Value (0 - 255)
   cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+
+
+  /* MORNING
+  int iLowH = 115;
+  int iHighH = 145;
+
+  int iLowS = 100;
+  int iHighS = 200;
+
+  int iLowV = 125;
+  int iHighV = 150;
+
+
+  //Create trackbars in "Control" window
+  cvCreateTrackbar("LowH", "Control", &iLowH, 115); //Hue (0 - 179)
+  cvCreateTrackbar("HighH", "Control", &iHighH, 145);
+
+  cvCreateTrackbar("LowS", "Control", &iLowS, 100); //Saturation (0 - 255)
+  cvCreateTrackbar("HighS", "Control", &iHighS, 200);
+
+  cvCreateTrackbar("LowV", "Control", &iLowV, 125); //Value (0 - 255)
+  cvCreateTrackbar("HighV", "Control", &iHighV, 255);
+*/
 
   blur( src_hsv, src_hsv, Size(3,3) );
   GaussianBlur( src_hsv, src_hsv, Size(5, 5), 0, 0 );
