@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
    std::vector<double> goalstate_t;
    std::vector<double> support_variable;
    std::vector<std::vector<double> > goalstate_data;
+   std::vector<double> support_vector_position_switch_control;
 
    /// Parameter of the camera (defined by calibration)
    double alphax =  712.27744;
@@ -148,16 +149,26 @@ int main(int argc, char* argv[])
    double alpha_c = 0;
    double xp[2];
    double x1p, y1p;
+   double p1, p2, p3;
+
+   double x1centereddist, x2centereddist, y1centereddist,y2centereddist;
 
    /// Gains of the control
-   double K1 = 0.002;       // Gain for the forward velocity
-   double K2 = 6.5/10;   // How fast beta converges to zero
-   double lambda = 300;    // How fast eta converges to zero
+   /*
+   double K1 = 0.001;       // Gain for the forward velocity
+   double K2 = 1;   // How fast beta converges to zero
+   double lambda = 2000;    // How fast eta converges to zero
+   */
+   double K1, K2, lambda;
+   /// Gains of the control
+   K1 = atof(argv[2]);
+   K2 = atof(argv[3]);
+   lambda =  atof(argv[4]);
 
    /// Delay before to get information from MocapRobulab (to avoid null data)
    std::cout << "... Initilization Virtual Tracking..." << std::endl;
 
-   int samples = 0.9/0.015; // 1 second divided by 20ms
+   int samples = 0.1/0.02; // 1 second divided by 20ms
    double Ka[samples];
 
    for (int i=1; i<=samples; ++i){
@@ -227,6 +238,35 @@ int main(int argc, char* argv[])
            y2centered = CirclesData[1][1] - PPy;
          }
 
+
+/*
+       if(CirclesData[0][0]>CirclesData[1][0])
+         {
+           x1centereddist = CirclesData[1][0] - PPx;
+           y1centereddist = CirclesData[1][1] - PPy;
+           x2centereddist = CirclesData[0][0] - PPx;
+           y2centereddist = CirclesData[0][1] - PPy;
+         }
+       else{
+           x1centereddist = CirclesData[0][0] - PPx;
+           y1centereddist = CirclesData[0][1] - PPy;
+           x2centereddist = CirclesData[1][0] - PPx;
+           y2centereddist = CirclesData[1][1] - PPy;
+         }
+       //void remove_distorsion(double *pixelxy, double *cc, double *fc, double *kc, double alpha_c, double *xp)
+
+        pixelxy[0]=x1centereddist  ;
+        pixelxy[1]=y1centereddist  ;
+        remove_distorsion(pixelxy, cc, fc, kc, alpha_c, xp);
+        x1centered = xp[0];
+        y1centered = xp[1];
+
+        pixelxy[0]=x2centereddist  ;
+        pixelxy[1]=y2centereddist  ;
+        remove_distorsion(pixelxy, cc, fc, kc, alpha_c, xp);
+        x2centered = xp[0];
+        y2centered = xp[1];
+*/
        /// If the targets or just one are not detected
 
        if((x1centered==x1centered_before && y1centered==y1centered_before) || (x2centered==x2centered_before && y2centered==y2centered_before))
@@ -277,7 +317,8 @@ int main(int argc, char* argv[])
 
        /// Control law in elliptic coordinates (Path Following like)
        if(iter<samples){
-         v = a * Ka[iter] * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
+         //v = a * Ka[iter] * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
+         v = a * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
          }
        else
          v = a * K1 * cos(eta) * cosh(xi) * sqrt(1+tan(eta) * tan(eta) * tanh(xi) * tanh(xi));
@@ -289,12 +330,16 @@ int main(int argc, char* argv[])
          }
 
 
-       if (betae<=0.01)
+       if (fabs(betae)<=0.001)
            omegao = -lambda*eta*K1-K2*betae;
        else
            omegao = -lambda*eta*K1*sin(betae)/betae-K2*betae;
 
-       omega = -omegao+K1*(1/(cos(2*eta)+cosh(2*xi)))*((-2)*cos(betae)*cos(eta)*sin(eta)+sin(betae)*sinh(2*xi));
+       p1 = cos(2*eta)+cosh(2*xi);
+       p2 = cos(betae)*cos(eta)*sin(eta);
+       p3 = sin(betae)*sinh(2*xi);
+
+       omega = -omegao+K1*(-2*p2+p3)/p1;
 
        w = omega;
 
@@ -304,6 +349,7 @@ int main(int argc, char* argv[])
        std::cout << "eta: " << eta << std::endl;
        std::cout << "betae: " << betae << std::endl;
        std::cout << "Robot controls - v: " << v << " omega: " << w <<  " omegao: " << omegao << std::endl;
+       std::cout << "K1 " << K1 << " - K2 " << K2 << " - lambda " << lambda << std::endl;
        //std::cout << " ----------------------------------------- " << std::endl;
 
        /// Move ROBOT
@@ -316,7 +362,8 @@ int main(int argc, char* argv[])
       else
          if(!target_lost){
            std::cout << "Move!" << std::endl;
-           Robot.move_robot(v, w);
+           if(atof(argv[1])==1)
+               Robot.move_robot(v, w);
            }
          else
            {
@@ -336,19 +383,47 @@ int main(int argc, char* argv[])
        robotcontol_data.push_back(robotcontrol_data_t);
        robotcontrol_data_t.clear();
 
+       support_vector_position_switch_control.clear();
+       support_vector_position_switch_control = MocapRobulab.item_XY_YAW_configuration_OFFSET(-2.23393);
+
        ros::Duration(0.02).sleep();
 
        ++iter;
    }
 
+   std::cout << "last pos change control " << support_vector_position_switch_control[0] << " " << support_vector_position_switch_control[1] << std::endl;
+
+
+   double spaceoffset = 1.3;
+   double timeoffset = spaceoffset / v;
 
 
    if(go_though_door){
        stop_interrupt=false;
      std::cout << "Through the door" << std::endl;
-     timenowdouble = time(NULL)+8;
+     timenowdouble = time(NULL)+timeoffset;
      while(time(NULL)<timenowdouble && stop_interrupt==false){
-         Robot.move_robot(0.2,0);
+         ros::spinOnce();
+         Robot.move_robot(v,0);
+
+
+         /// Take data from MocapRobulab, tracking the Robot
+         robotstate_t.clear();
+         robotstate_t = MocapRobulab.item_XY_YAW_configuration_OFFSET(-2.23393);
+         robotstate_data.push_back(robotstate_t);
+
+         robotcontrol_data_t.clear();
+         robotcontrol_data_t.push_back(v);
+         robotcontrol_data_t.push_back(0);
+         robotcontol_data.push_back(robotcontrol_data_t);
+
+
+
+         /// Concatenate vectors such that the vector is [x1 y1 t1 x2 y2 t2]
+         goalstate_t.insert( goalstate_t.end(), support_variable.begin(), support_variable.end() );
+
+         goalstate_data.push_back(goalstate_t);
+
          ros::Duration(0.02).sleep();
        }
     }
@@ -357,17 +432,17 @@ int main(int argc, char* argv[])
 
 
 
-/* OFFLINE TEST COMMUNICATION
-   for(int itert=0; itert<300; ++itert)
-     {
-       std::cout << "itert " << itert << std::endl;
-       robotcontrol_data_t.push_back(itert);
-       robotcontrol_data_t.push_back(300-itert);
-       robotcontol_data.push_back(robotcontrol_data_t);
-       robotcontrol_data_t.clear();
-     }
-*/
+   robotstate_data.push_back(support_vector_position_switch_control);
 
+   goalstate_t.clear();
+   goalstate_t.push_back(K1);
+   goalstate_t.push_back(K2);
+   goalstate_t.push_back(-1);
+   goalstate_t.push_back(lambda);
+   goalstate_t.push_back(lambda);
+   goalstate_t.push_back(-1);
+
+   goalstate_data.push_back(goalstate_t);
 
    std::cout << "Converting Data RobotControl to Matlab" << std::endl;
    Eigen::MatrixXd robotcontrol_data_matrix = Eigen::MatrixXd::Zero(robotcontol_data.size(),2);
@@ -414,7 +489,7 @@ int main(int argc, char* argv[])
     _MocapRobulabPublisher.publish(robotstate_data_msg);
     _MocapGoalPublisher.publish(goalstate_data_msg);
 
-    ros::Duration(0.01).sleep();
+    ros::Duration(0.05).sleep();
     }
 
    Robot.move_robot(0, 0);

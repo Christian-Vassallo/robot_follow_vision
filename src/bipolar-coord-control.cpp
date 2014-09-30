@@ -1,5 +1,12 @@
 /// Bipolar Control
 
+/// INPUT INSTRUCTION
+/// 0 not moving (test) - 1 moving
+/// K0  (double)
+/// K   (double)
+/// K1  (double)
+/// K2  (double)
+/// Gain: K0 0.1 ; K 2.5 ; K1 3.5 K2 0.15
 
 #include "ros/ros.h"
 #include <sstream>
@@ -143,6 +150,7 @@ int main(int argc, char* argv[])
    std::vector<double> goalstate_t;
    std::vector<double> support_variable;
    std::vector<std::vector<double> > goalstate_data;
+   std::vector<double> support_vector_position_switch_control;
 
    /// Parameter of the camera (defined by calibration)
    double alphax =  712.27744;
@@ -173,6 +181,7 @@ int main(int argc, char* argv[])
 
    int samples = 0.9/0.015; // 1 second divided by 20ms
    double Ka[samples];
+   double x1centereddist, x2centereddist, y1centereddist,y2centereddist;
 
    for (int i=1; i<=samples; ++i){
      Ka[i] = (double)i/samples;
@@ -241,6 +250,51 @@ int main(int argc, char* argv[])
            y2centered = CirclesData[1][1] - PPy;
          }
 
+
+       /*
+              if(CirclesData[0][0]>CirclesData[1][0])
+                {
+                  x1centered = CirclesData[1][0] - PPx;
+                  y1centered = CirclesData[1][1] - PPy;
+                  x2centered = CirclesData[0][0] - PPx;
+                  y2centered = CirclesData[0][1] - PPy;
+                }
+              else{
+                  x1centered = CirclesData[0][0] - PPx;
+                  y1centered = CirclesData[0][1] - PPy;
+                  x2centered = CirclesData[1][0] - PPx;
+                  y2centered = CirclesData[1][1] - PPy;
+                }
+       */
+/*
+
+              if(CirclesData[0][0]>CirclesData[1][0])
+                {
+                  x1centereddist = CirclesData[1][0] - PPx;
+                  y1centereddist = CirclesData[1][1] - PPy;
+                  x2centereddist = CirclesData[0][0] - PPx;
+                  y2centereddist = CirclesData[0][1] - PPy;
+                }
+              else{
+                  x1centereddist = CirclesData[0][0] - PPx;
+                  y1centereddist = CirclesData[0][1] - PPy;
+                  x2centereddist = CirclesData[1][0] - PPx;
+                  y2centereddist = CirclesData[1][1] - PPy;
+                }
+              //void remove_distorsion(double *pixelxy, double *cc, double *fc, double *kc, double alpha_c, double *xp)
+
+               pixelxy[0]=x1centereddist  ;
+               pixelxy[1]=y1centereddist  ;
+               remove_distorsion(pixelxy, cc, fc, kc, alpha_c, xp);
+               x1centered = xp[0];
+               y1centered = xp[1];
+
+               pixelxy[0]=x2centereddist  ;
+               pixelxy[1]=y2centereddist  ;
+               remove_distorsion(pixelxy, cc, fc, kc, alpha_c, xp);
+               x2centered = xp[0];
+               y2centered = xp[1];
+*/
        /// If the targets or just one are not detected
 
        if((x1centered==x1centered_before && y1centered==y1centered_before) || (x2centered==x2centered_before && y2centered==y2centered_before))
@@ -343,18 +397,18 @@ int main(int argc, char* argv[])
 
         // Some print out
        std::cout << " ----------------------------------------- " << std::endl;
-       //std::cout << "tau " << tau << std::endl;
-       //std::cout << "alpha: " << alpha << std::endl;
-       //std::cout << "betap: " << betap << std::endl;
-       //std::cout << "beta_d: " << beta_d << std::endl;
-       //std::cout << "s: " << s << std::endl;
+       std::cout << "tau " << tau << std::endl;
+       std::cout << "alpha: " << alpha << std::endl;
+       std::cout << "betap: " << betap << std::endl;
+       std::cout << "beta_d: " << beta_d << std::endl;
+       std::cout << "s: " << s << std::endl;
 
        std::cout << "Gain: K0 " << argv[2] << " ; K " << argv[3] << " ; K1 " << argv[4] << " K2 " << argv[5] << std::endl;
        std::cout << "Robot controls - v: " << v << " omega: " << w <<  " omegao: " << omegao << std::endl;
        //std::cout << " ----------------------------------------- " << std::endl;
 
        /// Move ROBOT
-       if((CirclesData[1][1]<20 || CirclesData[0][1]<20) || (CirclesData[1][1]>464 || CirclesData[0][1]>464)){
+       if((CirclesData[1][1]<20 || CirclesData[0][1]<20) || (CirclesData[1][1]>470 || CirclesData[0][1]>470)){
          Robot.move_robot(0, 0);
          if(CirclesData[0][0]!=0 && CirclesData[0][1]!=0)
           stop_interrupt=true;
@@ -365,7 +419,7 @@ int main(int argc, char* argv[])
            if( atof(argv[1])==1 ||  atof(argv[1])==2){
                std::cout << "Move!" << std::endl;
 
-            Robot.move_robot(v, w);
+              Robot.move_robot(v, w);
              }
            }
          else
@@ -378,6 +432,7 @@ int main(int argc, char* argv[])
          stop_interrupt=true;
          exit(-1);
          std::cout << "TARGET NOT VALID" << std::endl;
+         Robot.move_robot(0,0);
          }
 
        /// Create message to send to Matlab
@@ -386,21 +441,42 @@ int main(int argc, char* argv[])
        robotcontol_data.push_back(robotcontrol_data_t);
        robotcontrol_data_t.clear();
 
+       support_vector_position_switch_control.clear();
+       support_vector_position_switch_control = MocapRobulab.item_XY_YAW_configuration_OFFSET(-2.23393);
+
        ros::Duration(0.02).sleep();
 
        ++iter;
    }
 
-   double spaceoffset = 1.5;
+   double spaceoffset = 0.9;
    double timeoffset = spaceoffset / v;
 
-   if(go_though_door){
+   std::cout << "last pos change control " << support_vector_position_switch_control[0] << " " << support_vector_position_switch_control[1] << std::endl;
+
+   if(go_though_door && atof(argv[1])==2){
        stop_interrupt=false;
      std::cout << "Through the door" << std::endl;
      timenowdouble = time(NULL)+timeoffset;
      while(time(NULL)<timenowdouble && stop_interrupt==false){
-         if( atof(argv[1])==2)
-            Robot.move_robot(v,0);
+         ros::spinOnce();
+         Robot.move_robot(v,0);
+
+
+         /// Take data from MocapRobulab, tracking the Robot
+         robotstate_t.clear();
+         robotstate_t = MocapRobulab.item_XY_YAW_configuration_OFFSET(-2.23393);
+         robotstate_data.push_back(robotstate_t);
+
+         robotcontrol_data_t.clear();
+         robotcontrol_data_t.push_back(v);
+         robotcontrol_data_t.push_back(0);
+         robotcontol_data.push_back(robotcontrol_data_t);
+
+         /// Concatenate vectors such that the vector is [x1 y1 t1 x2 y2 t2]
+         goalstate_t.insert( goalstate_t.end(), support_variable.begin(), support_variable.end() );
+
+         goalstate_data.push_back(goalstate_t);
 
          ros::Duration(0.02).sleep();
        }
@@ -417,19 +493,21 @@ int main(int argc, char* argv[])
      }
 
 */
-/* OFFLINE TEST COMMUNICATION
-   for(int itert=0; itert<300; ++itert)
-     {
-       std::cout << "itert " << itert << std::endl;
-       robotcontrol_data_t.push_back(itert);
-       robotcontrol_data_t.push_back(300-itert);
-       robotcontol_data.push_back(robotcontrol_data_t);
-       robotcontrol_data_t.clear();
-     }
-*/
 
-   /*
-   std::cout << "Converting Data RobotControl to Matlab" << std::endl;
+   // Save switch control pos value as last value
+   robotstate_data.push_back(support_vector_position_switch_control);
+
+   goalstate_t.clear();
+   goalstate_t.push_back(K0);
+   goalstate_t.push_back(K);
+   goalstate_t.push_back(-1);
+   goalstate_t.push_back(K1);
+   goalstate_t.push_back(K2);
+   goalstate_t.push_back(-1);
+
+   goalstate_data.push_back(goalstate_t);
+
+   std::cout << "Convertingg Data RobotControl to Matlab" << std::endl;
    Eigen::MatrixXd robotcontrol_data_matrix = Eigen::MatrixXd::Zero(robotcontol_data.size(),2);
    std_msgs::Float64MultiArray robotcontrol_data_msg;
 
@@ -476,8 +554,9 @@ int main(int argc, char* argv[])
 
     ros::Duration(0.01).sleep();
     }
-*/
+
    Robot.move_robot(0, 0);
+
 
    return 0;
 

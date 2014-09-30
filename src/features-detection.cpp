@@ -38,7 +38,7 @@
 #include <visp/vpImageConvert.h>
 #include <visp/vpMeLine.h>
 #include <visp/vpMeEllipse.h>
-
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "Robulab10Class.hpp"
 #include "CameraClass.hpp"
 
@@ -77,6 +77,7 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 
   std_msgs::Float64MultiArray cog_blobs;
   Eigen::MatrixXd blobs_matrix_data = Eigen::MatrixXd::Zero(2,3);
+
 
   /// Ellipses are detected considering rectangle shape
 
@@ -174,6 +175,7 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 
   double PPx = 330.98367;        // Principal point X
   double PPy = 273.41515;        // Principal point Y
+  unsigned int iter = 1;
 
   while(!stop_interrupt) {
 
@@ -189,7 +191,6 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 
 
     /// Publishing
-
     // blobs1 x (u)
     blobs_matrix_data(0,0) = blob.getCog().get_u();
     // blobs1 y (v)
@@ -209,13 +210,13 @@ void streaming_process(cv::VideoCapture vcap, ros::Publisher* _blob_publisher)
 
     // Define the message to send
     _blob_publisher->publish(cog_blobs);
-
     std::cout << "ellipse 1: " << blobs_matrix_data(0,0) << " - " << blobs_matrix_data(0,1) << std::endl;
     std::cout << "ellipse 2: " << blobs_matrix_data(1,0) << " - " << blobs_matrix_data(1,1) << std::endl;
 
+    ros::Duration(0.01).sleep();
+    iter++;
   }
 
-  ros::Duration(0.02).sleep();
 
 }
 

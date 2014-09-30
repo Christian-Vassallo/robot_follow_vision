@@ -8,12 +8,12 @@ node = rosmatlab.node('matlab', 'http://140.93.69.12:11311');
 %node = rosmatlab.node('matlab', 'http://localhost:11311');
 
 % Subscriber 
-RobotState = node.addSubscriber('RobotState','std_msgs/Float64MultiArray',1);
+RobotState = node.addSubscriber('RobotState','std_msgs/Float64MultiArray',1000);
 RobotState.setOnNewMessageListeners({@robotStateMSG});
 
-RobotControl = node.addSubscriber('VelocityControl','std_msgs/Float64MultiArray',1);
+RobotControl = node.addSubscriber('VelocityControl','std_msgs/Float64MultiArray',1000);
 RobotControl.setOnNewMessageListeners({@VelControlMSG});
 
-ROSCONN2 = node.addSubscriber('GoalState','std_msgs/Float64MultiArray',1);
-ROSCONN2.setOnNewMessageListeners({@ROSCONN2});
+GoalState = node.addSubscriber('GoalState','std_msgs/Float64MultiArray',1000);
+GoalState.setOnNewMessageListeners({@GoalStateMSG});
 
